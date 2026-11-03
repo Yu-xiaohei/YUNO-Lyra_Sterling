@@ -27,9 +27,10 @@
     { id: 3, tab: "北京 → 大阪 → 东京 → 北京", sub: "12.20 / 25 / 30", title: "北京 → 大阪 → 东京 → 北京", dates: "2026.12.20 / 12.25 / 12.30", days: "11 天行程", type: "多城市联程", stops: [["北京", "BEIJING"], ["大阪", "OSAKA"], ["东京", "TOKYO"], ["北京", "BEIJING"]], image: "日本 · JAPAN", period: "2026 冬季" },
     { id: 4, tab: "北京 ⇄ 东京", sub: "07.05 — 07.18", title: "北京 ⇄ 东京", dates: "2027.07.05 — 07.18", days: "14 天行程", type: "往返直飞", stops: [["北京", "BEIJING"], ["东京", "TOKYO"], ["北京", "BEIJING"]], image: "东京 · TOKYO", period: "2027 夏季" }
   ];
-  const state = { data: null, task: 1, period: 30, ranks: new Set([1, 2, 3]), switching: false, pendingTask: null, gallery: {} };
+  const state = { data: null, task: 1, period: 30, ranks: new Set([1, 2, 3]), switching: false, pendingTask: null, gallery: {}, recordDates: {} };
   const disclosureJobs = new Map();
   let panelContext = null;
+  let archiveContext = null;
   const motion = () => !!window.gsap && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const icons = () => window.lucide?.createIcons({ attrs: { "aria-hidden": "true" } });
   const numeric = n => typeof n === "number" && Number.isFinite(n);
@@ -37,9 +38,58 @@
     return state.data.history.filter(row => row.task === id).map(row => ({ ...row, lowest: numeric(row.lowest) ? row.lowest : row.r1 })).sort((a, b) => a.date.localeCompare(b.date));
   }
   function rows(id) { return state.data.latest.filter(row => row.task === id).sort((a, b) => a.rank - b.rank); }
+  function recordDate(id = state.task) {
+    const points = history(id);
+    return points.some(p => p.date === state.recordDates[id]) ? state.recordDates[id] : points.at(-1)?.date;
+  }
+  function recordOptions(id, date) {
+    const saved = state.data.snapshots?.find(row => row.task === id && row.date === date);
+    if (saved) return [...saved.options].sort((a, b) => a.rank - b.rank);
+    const last = history(id).at(-1), latest = rows(id);
+    // Legacy files contain details only for the latest recorded day.
+    return last?.date === date && latest.every(row => row.price === last[`r${row.rank}`]) ? latest : [];
+  }
+  function archiveContent(task) {
+    const points = history(task.id), date = recordDate(task.id), index = points.findIndex(p => p.date === date);
+    const options = recordOptions(task.id, date), point = points[index];
+    const latest = index === points.length - 1;
+    return `<div class="section-top options-heading"><div><h3 id="options-title">航班方案</h3><span class="result-count">${options.length}</span></div>
+      <span class="section-sub">${latest ? "最新记录" : "历史记录"} · 价格从低到高</span></div>
+      <div class="archive-toolbar"><label for="record-date">${icon("calendar-days")}记录日期</label>
+        <div class="archive-controls">
+          <button class="icon-button" data-record-step="-1" aria-label="上一条日期记录" title="上一条日期记录" ${index <= 0 ? "disabled" : ""}>${icon("chevron-left")}</button>
+          <select id="record-date" aria-label="航班记录日期" ${points.length ? "" : "disabled"}>${points.length ? [...points].reverse().map(p => `<option value="${p.date}" ${p.date === date ? "selected" : ""}>${p.date}${p.date === points.at(-1).date ? " · 最新" : ""}${recordOptions(task.id, p.date).length ? "" : " · 仅价格"}</option>`).join("") : '<option>暂无记录</option>'}</select>
+          <button class="icon-button" data-record-step="1" aria-label="下一条日期记录" title="下一条日期记录" ${index < 0 || latest ? "disabled" : ""}>${icon("chevron-right")}</button>
+          ${!latest && points.length ? `<button class="icon-button" data-record-latest aria-label="回到最新记录" title="回到最新记录">${icon("rotate-ccw")}</button>` : ""}
+        </div>
+      </div>
+      <div id="options">${options.length ? options.map((r, i) => option(r, i, task)).join("") : `<div class="archive-empty">${icon("file-clock")}<h4>${point ? "当天未保存航班详情" : "暂无航班记录"}</h4><p>${point ? "已保留当天价格，航司与航段详情未记录。" : "等待首次有效采集。"}</p>${point ? `<div class="archive-prices">${[1, 2, 3].filter(r => numeric(point[`r${r}`])).map(r => `<span>第 ${r} 名<strong>${money(point[`r${r}`])}</strong></span>`).join("")}</div>` : ""}</div>`}</div>`;
+  }
+  function syncChartSelection() {
+    const date = recordDate();
+    $$(".chart-hit").forEach(hit => hit.setAttribute("aria-pressed", String(hit.dataset.date === date)));
+    $$(".chart-selection").forEach(line => { line.style.display = line.dataset.date === date ? "" : "none"; });
+  }
+  function selectRecord(date, restoreFocus = false) {
+    if (state.switching || !history(state.task).some(p => p.date === date) || date === recordDate()) return;
+    state.recordDates[state.task] = date;
+    const section = $(".options-section");
+    for (const region of [...disclosureJobs.keys()]) if (section.contains(region)) stopDisclosureJob(region);
+    archiveContext?.revert(); archiveContext = null;
+    if (window.gsap) gsap.killTweensOf($$("*", section));
+    section.innerHTML = archiveContent(tasks[state.task - 1]);
+    icons();
+    syncChartSelection();
+    if (restoreFocus) $("#record-date").focus({ preventScroll: true });
+    if (motion()) archiveContext = gsap.context(() => {
+      gsap.fromTo($$(".option-row,.archive-empty", section), { y: 8, opacity: 0 }, { y: 0, opacity: 1, duration: .36, stagger: .045, ease: "power2.out", clearProps: "transform,opacity" });
+    }, section);
+    $("#live-status").textContent = `${date}，${recordOptions(state.task, date).length ? "已显示当天航班方案" : "当天仅保存价格，未保存航班详情"}`;
+  }
   function reducedFinal() {
     if (!motion()) {
       panelContext?.revert(); panelContext = null;
+      archiveContext?.revert(); archiveContext = null;
       const counter = $(".count-value");
       if (counter) counter.textContent = Number(counter.dataset.value).toLocaleString("zh-CN");
       $$(".option-detail,.journey-detail").forEach(region => {
@@ -58,6 +108,7 @@
   function cleanup() {
     for (const region of disclosureJobs.keys()) stopDisclosureJob(region);
     panelContext?.revert(); panelContext = null;
+    archiveContext?.revert(); archiveContext = null;
     if (window.gsap) gsap.killTweensOf($$("*", $("#task-panel")));
   }
   function renderTabs() {
@@ -113,8 +164,7 @@
           <div class="price-gap"><span>最高与最低相差</span><strong>${money(spread)}</strong></div>
         </section>
       </div>
-      <section class="options-section reveal" aria-labelledby="options-title"><div class="section-top options-heading"><div><h3 id="options-title">航班方案</h3><span class="result-count">${options.length}</span></div><span class="section-sub">价格从低到高 · ${esc(dateLabel)}</span></div>
-      <div id="options">${options.map((r, i) => option(r, i, task)).join("") || `<p class="section-sub">暂无航班方案</p>`}</div></section>`;
+      <section class="options-section reveal" aria-labelledby="options-title">${archiveContent(task)}</section>`;
     renderChart();
     icons();
     const gallery = $(".destination");
@@ -183,7 +233,7 @@
     const cityRoute = journeys.map((j, i) => `${i === 0 ? `${j[0].from} → ` : ""}${j.at(-1).to}`).join(" → ");
     const bag = String(entry.baggage || "行李额未记录").replace(/\s*included/g, "已含");
     return `<article class="option-row"><button class="option-trigger" id="trigger-${uid}" aria-expanded="false" aria-controls="detail-${uid}">
-      <span class="rank rank-${entry.rank}">${entry.rank}</span><span><span class="airline-name">${esc(entry.airline || "航司未记录")}</span><span class="option-caption">${journeys.length} 程 · ${transfers ? `${transfers} 次中转` : "各程直飞"}${entry.rank === 1 ? " · 当前最低" : ""}</span></span>
+      <span class="rank rank-${entry.rank}">${entry.rank}</span><span><span class="airline-name">${esc(entry.airline || "航司未记录")}</span><span class="option-caption">${journeys.length} 程 · ${transfers ? `${transfers} 次中转` : "各程直飞"}${entry.rank === 1 ? " · 当日最低" : ""}</span></span>
       <span class="option-overview"><span class="option-route">${esc(cityRoute || "航段未记录")}</span><span class="option-bag">${icon("luggage")}${esc(bag)}</span></span>
       <span class="option-price"><strong>${money(entry.price)}</strong><small>行程总价</small></span>${icon("chevron-down").replace('<i ', '<i class="chevron" ')}</button>
       <div class="option-detail" id="detail-${uid}" role="region" aria-labelledby="trigger-${uid}" hidden inert><div class="collapse-body"><div class="option-inner">${journeys.length ? journeys.map((flights, i) => journey(flights, i, uid, task, journeys.length)).join("") : `<p class="section-sub">该方案暂无逐段数据</p>`}</div></div></div></article>`;
@@ -220,11 +270,14 @@
     const lastDate = Date.parse(points.at(-1).date);
     const x = i => lastDate === firstDate ? (L + W - R) / 2 : L + (Date.parse(points[i].date) - firstDate) / (lastDate - firstDate) * (W - L - R);
     const y = value => T + (max - value) / (max - min) * (H - T - B);
-    let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="本行程前三名价格走势，共 ${points.length} 天记录"><title>前三名价格走势，共 ${points.length} 天</title>`;
+    let svg = `<svg viewBox="0 0 ${W} ${H}" role="group" aria-label="本行程前三名价格走势，共 ${points.length} 天记录"><title>前三名价格走势，共 ${points.length} 天</title>`;
     for (let i = 0; i < 4; i++) {
       const v = min + (max - min) * i / 3, yy = y(v);
       svg += `<line class="grid-line" x1="${L}" x2="${W - 16}" y1="${yy}" y2="${yy}"/><text x="${L - 10}" y="${yy + 4}" text-anchor="end">${money(Math.round(v))}</text>`;
     }
+    points.forEach((p, i) => {
+      svg += `<line class="chart-selection" data-date="${p.date}" x1="${x(i)}" x2="${x(i)}" y1="${T - 8}" y2="${H - B}" style="${p.date === recordDate() ? "" : "display:none"}"/>`;
+    });
     for (let rank = 1; rank <= 3; rank++) {
       if (!state.ranks.has(rank)) continue;
       const entries = points.map((p, i) => ({ p, i })).filter(({ p }) => numeric(p[`r${rank}`]));
@@ -246,7 +299,7 @@
       if (i % step === 0 || i === points.length - 1) svg += `<text x="${x(i)}" y="${H - 5}" text-anchor="middle">${esc(p.date.slice(5).replace("-", "."))}</text>`;
       const left = i ? (x(i - 1) + x(i)) / 2 : L;
       const right = i < points.length - 1 ? (x(i + 1) + x(i)) / 2 : W - R;
-      svg += `<rect class="chart-hit" tabindex="0" role="img" aria-label="${esc(p.date)}，${[1, 2, 3].filter(r => state.ranks.has(r)).map(r => `第${r}名${money(p[`r${r}`])}`).join("，")}" data-point="${i}" x="${left}" y="${T - 12}" width="${Math.max(right - left, 10)}" height="${H - B - T + 12}" fill="transparent"/>`;
+      svg += `<rect class="chart-hit" tabindex="0" role="button" aria-pressed="${p.date === recordDate()}" aria-label="${esc(p.date)}，${[1, 2, 3].filter(r => state.ranks.has(r)).map(r => `第${r}名${money(p[`r${r}`])}`).join("，")}，查看当天航班记录" data-date="${p.date}" data-point="${i}" x="${left}" y="${T - 12}" width="${Math.max(right - left, 10)}" height="${H - B - T + 12}" fill="transparent"/>`;
     });
     svg += "</svg>";
     $("#chart-area").innerHTML = `<div class="chart">${svg}<div class="chart-tooltip" hidden></div></div>${legend}<div class="baseline-note">${icon("info")}${points.length === 1 ? "当前仅有 1 天记录，后续更新后形成趋势线" : `显示 ${points[0].date} 至 ${points.at(-1).date} · ${points.length} 天记录`}</div>`;
@@ -264,6 +317,10 @@
       hit.addEventListener("focus", show);
       hit.addEventListener("pointerleave", () => { $(".chart-tooltip").hidden = true; });
       hit.addEventListener("blur", () => { $(".chart-tooltip").hidden = true; });
+      hit.addEventListener("click", () => selectRecord(hit.dataset.date));
+      hit.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") { event.preventDefault(); selectRecord(hit.dataset.date); }
+      });
     });
   }
   function animateChart() {
@@ -381,9 +438,10 @@
   function validate(data) {
     if (!data || data.schemaVersion !== 1 || !Array.isArray(data.history) || !Array.isArray(data.latest)) throw new Error("数据文件结构不正确");
     const seen = new Set();
+    const validDate = date => typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date) && Number.isFinite(Date.parse(date)) && new Date(date).toISOString().slice(0, 10) === date;
     for (const row of data.history) {
       const key = `${row.task}:${row.date}`;
-      if (!Number.isInteger(row.task) || row.task < 1 || row.task > 4 || !/^\d{4}-\d{2}-\d{2}$/.test(row.date) || seen.has(key)) throw new Error("历史记录包含无效任务、日期或重复项");
+      if (!Number.isInteger(row.task) || row.task < 1 || row.task > 4 || !validDate(row.date) || seen.has(key)) throw new Error("历史记录包含无效任务、日期或重复项");
       for (const field of ["lowest", "r1", "r2", "r3"]) if (row[field] != null && (!numeric(row[field]) || row[field] < 0)) throw new Error("价格必须是非负数");
       seen.add(key);
     }
@@ -395,6 +453,26 @@
         if (!leg.from || !leg.to || !leg.date || !/^\d{1,2}:\d{2}$/.test(leg.dep) || !/^\d{1,2}:\d{2}$/.test(leg.arr)) throw new Error("航段字段不完整");
       }
       seen.add(key);
+    }
+    if (data.snapshots !== undefined) {
+      if (!Array.isArray(data.snapshots)) throw new Error("历史方案 snapshots 必须是数组");
+      seen.clear();
+      for (const snapshot of data.snapshots) {
+        if (!snapshot || !validDate(snapshot.date) || !Number.isInteger(snapshot.task) || snapshot.task < 1 || snapshot.task > 4) throw new Error("历史方案日期或任务无效");
+        const key = `${snapshot.task}:${snapshot.date}`;
+        const point = data.history.find(row => row.task === snapshot.task && row.date === snapshot.date);
+        if (seen.has(key) || !point || !Array.isArray(snapshot.options) || snapshot.options.length < 1 || snapshot.options.length > 3) throw new Error("历史方案重复、缺少价格记录或方案数量无效");
+        const ranks = new Set();
+        for (const row of snapshot.options) {
+          if (!row || row.task !== snapshot.task || ![1, 2, 3].includes(row.rank) || ranks.has(row.rank) || !numeric(row.price) || row.price < 0 || row.price !== point[`r${row.rank}`] || !Array.isArray(row.legs) || !row.legs.length) throw new Error("历史方案排名、价格或航段与记录不一致");
+          for (const leg of row.legs) {
+            if (!leg || !leg.from || !leg.to || !leg.date || !/^\d{1,2}:\d{2}$/.test(leg.dep) || !/^\d{1,2}:\d{2}$/.test(leg.arr)) throw new Error("历史方案航段字段不完整");
+          }
+          ranks.add(row.rank);
+        }
+        if ([1, 2, 3].some(rank => numeric(point[`r${rank}`]) !== ranks.has(rank))) throw new Error("历史方案未包含当天全部排名");
+        seen.add(key);
+      }
     }
   }
   async function init() {
@@ -416,6 +494,12 @@
     }
   }
   document.addEventListener("click", event => {
+    const recordStep = event.target.closest("[data-record-step]");
+    if (recordStep && !recordStep.disabled) {
+      const points = history(state.task), index = points.findIndex(p => p.date === recordDate());
+      if (points[index + +recordStep.dataset.recordStep]) selectRecord(points[index + +recordStep.dataset.recordStep].date, true);
+    }
+    if (event.target.closest("[data-record-latest]")) selectRecord(history(state.task).at(-1)?.date, true);
     const galleryStep = event.target.closest("[data-gallery-step]");
     if (galleryStep) changeGallery(+galleryStep.dataset.galleryStep);
     const galleryIndex = event.target.closest("[data-gallery-index]");
@@ -437,6 +521,9 @@
       state.ranks.has(r) ? state.ranks.delete(r) : state.ranks.add(r);
       renderChart(); animateChart();
     }
+  });
+  document.addEventListener("change", event => {
+    if (event.target.id === "record-date") selectRecord(event.target.value, true);
   });
   $("#task-tabs").addEventListener("keydown", event => {
     const current = event.target.closest("[role=tab]");

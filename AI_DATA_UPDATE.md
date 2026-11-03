@@ -7,8 +7,8 @@
 ## 文件在哪里
 
 - 将本网站包的内容放到 GitHub 仓库根目录时，仓库文件路径就是 `data/prices.json`。
-- 部署后请在执行环境配置仓库 owner、repo 和 Pages 发布分支。当前交付尚未绑定仓库，
-  不要猜测这些值，不要默认向其他仓库或分支写入。
+- 当前目标仓库为 `Yu-xiaohei/YUNO-Lyra_Sterling`，Pages 发布分支为 `main`，目录为仓库根目录。
+  只向这个已授权目标更新数据；若收到更换仓库的要求，先确认新目标。
 - 读取并修改仓库里的源文件，再提交到发布分支；不要尝试对网站的公开 JSON 地址发送写入请求。
 - 如果只提供本地文件编辑能力，编辑本地 `data/prices.json` 并明确报告“尚未提交 GitHub”。
   本地文件更改不代表已更新线上网站。
@@ -31,8 +31,9 @@
 
 ## JSON 结构
 
-顶层保留 `schemaVersion: 1`、`history` 和 `latest`。
+顶层保留 `schemaVersion: 1`、`history`、`latest` 和 `snapshots`。
 JSON 使用 UTF-8，不写注释，不加尾逗号。
+旧版只有 history 和 latest 时网页仍可读取，但从本版起每次成功采集必须同时保存 snapshots。
 
 ### history：查询记录
 
@@ -81,6 +82,45 @@ JSON 使用 UTF-8，不写注释，不加尾逗号。
 同一任务按价格由低到高排序，`price` 与当天 history 中的对应排名一致。
 保留你原有查询条件下的价格口径，不混用单人价、多人价、单程价和完整行程价。
 
+### snapshots：按日保存完整方案
+
+这是历史详情的数据源，不能省略或在跨天更新时清空。
+每个任务每天最多一个快照，主键与 history 相同，为 `(date, task)`。
+
+| 字段 | 含义 |
+| --- | --- |
+| date | 北京时间的采集日期，`YYYY-MM-DD`，与对应 history 相同 |
+| task | 任务编号，整数 1–4 |
+| options | 当次采集的完整方案数组，格式与 latest 中的方案完全相同，包含 task、rank、price、airline、baggage、legs |
+
+options 保存当天真实查得的 1–3 个方案，包含每个方案的全部航段。
+排名、数量和价格必须与当天 history 的 r1、r2、r3 一一对应；未获得的排名在 history 写 null。
+当日同一任务重跑时整体替换该快照的 options；跨天追加新快照，保留全部旧快照。
+latest 中该任务的内容应与最近成功日期的 snapshot.options 一致。
+
+合并方式示例（JavaScript，newOptions 是已校验的当次结果，captureDate 是实际采集日，task 是当前成功任务）：
+
+```javascript
+const snapshot = {
+  date: captureDate,
+  task,
+  options: structuredClone(newOptions)
+};
+data.snapshots = [
+  ...(data.snapshots || []).filter(row => !(row.task === task && row.date === captureDate)),
+  snapshot
+];
+data.latest = [
+  ...data.latest.filter(row => row.task !== task),
+  ...structuredClone(newOptions)
+];
+// 同时合并对应的 history 记录，三部分全部校验成功后才写回整个 JSON。
+```
+
+不要把当天的新方案复制到以前的日期；只有保存过完整方案，才可以显示那天的详情。
+历史日期只有价格时保留原记录、不补造快照，网页会显示“当天未保存航班详情”。
+本版只将原文件中 2026-11-03 的真实已有 12 个方案归档为 4 个任务快照，没有新增报价。
+
 ### legs：逐航段
 
 | 字段 | 含义 |
@@ -103,13 +143,16 @@ task 4 的航班日期必须使用 2027 年，采集日期仍按实际采集当�
 
 ## 每次更新的顺序
 
-1. 读取发布分支上的最新完整 JSON，保留其中所有已有历史与其他任务记录。
+1. 读取发布分支上的最新完整 JSON，保留其中所有已有 history、snapshots 与其他任务记录。
 2. 按四项任务原有条件采集，分别确认每项是否成功。
-3. 对成功任务更新当天 history，并替换该任务的 latest；失败任务原样保留。
+3. 对成功任务更新当天 history、追加或替换当天 snapshots，并替换该任务的 latest；
+   这三部分必须在同一次文件提交中完成。失败任务的三部分全部原样保留。
 4. 没有结果、请求失败、验证受阻都不能编造报价或写成零元。
    没有确认有效方案时不增加该任务的当天价格记录。
 5. 写入前校验 JSON 可解析、schemaVersion 不变、任务编号有效、日期真实有效、
-   history 主键无重复、latest 排名无重复、价格与排名对应，航段完整且顺序正确。
+   history 与 snapshots 的主键各自无重复、latest 与每份快照的排名无重复、
+   每份快照都有对应 history、快照的全部排名价格与当天记录一致、
+   latest 与最近成功快照一致，航段完整且顺序正确。
 6. 先在内存或临时文件合并、校验，再一次性替换目标文件，避免网页读到半份 JSON。
 7. 只提交 `data/prices.json`，在提交说明中写采集日期与成功更新的任务编号。
 8. 核实提交及网站发布结果，再报告哪些任务更新成功、哪些失败，以及提交标识。
@@ -130,7 +173,7 @@ GitHub token 的 Contents 权限本身不限制到某一个文件；
 
 如果定时程序运行在 GitHub Actions 中，不要假设使用内置 GITHUB_TOKEN 提交
 就能触发分支式 Pages 构建；需要配置相应的发布工作流或适用的授权方式。
-仓库与自动化方案尚未确定前，不要擅自创建 token、提交代码或配置定时任务。
+日常采集只提交已授权的数据更新，不擅自创建 token、修改界面代码或配置定时任务。
 
 ## 官方参考
 
