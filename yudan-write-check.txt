@@ -1,0 +1,3 @@
+GitHub write permission check by Yudan, 2026-11-03.
+This is a disposable test file for authorizing daily data sync writes.
+Safe to delete.
