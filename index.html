@@ -4,13 +4,37 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#FFA502">
-  <meta name="description" content="日本机票价格记录与航班方案对比">
+  <meta name="description" content="中国与日本机票价格监控，查看北京、东京、大阪多程方案，追踪历史价格与完整航班详情。">
+  <link rel="canonical" href="https://yu-xiaohei.github.io/YUNO-Lyra_Sterling/">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:site_name" content="于の旅行侦探 YUNO Lyra Sterling">
+  <meta property="og:title" content="于の旅行侦探 · 机票价格监控">
+  <meta property="og:description" content="中国与日本机票价格监控，查看北京、东京、大阪多程方案，追踪历史价格与完整航班详情。">
+  <meta property="og:url" content="https://yu-xiaohei.github.io/YUNO-Lyra_Sterling/">
+  <meta property="og:image" content="https://yu-xiaohei.github.io/YUNO-Lyra_Sterling/assets/share-icon.png?v=20261103-1">
+  <meta property="og:image:secure_url" content="https://yu-xiaohei.github.io/YUNO-Lyra_Sterling/assets/share-icon.png?v=20261103-1">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="600">
+  <meta property="og:image:height" content="600">
+  <meta property="og:image:alt" content="于の旅行侦探 YUNO Lyra Sterling 标志">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="于の旅行侦探 · 机票价格监控">
+  <meta name="twitter:description" content="中国与日本机票价格监控，查看北京、东京、大阪多程方案，追踪历史价格与完整航班详情。">
+  <meta name="twitter:image" content="https://yu-xiaohei.github.io/YUNO-Lyra_Sterling/assets/share-icon.png?v=20261103-1">
+  <meta itemprop="name" content="于の旅行侦探 · 机票价格监控">
+  <meta itemprop="description" content="中国与日本机票价格监控，查看北京、东京、大阪多程方案，追踪历史价格与完整航班详情。">
+  <meta itemprop="image" content="https://yu-xiaohei.github.io/YUNO-Lyra_Sterling/assets/share-icon.png?v=20261103-1">
+  <meta name="wechat-signature-endpoint" content="">
+  <link rel="image_src" href="https://yu-xiaohei.github.io/YUNO-Lyra_Sterling/assets/share-icon.png?v=20261103-1">
+  <link rel="apple-touch-icon" href="./assets/share-icon.png?v=20261103-1">
   <link rel="icon" href="./assets/YUNO-Lyra_Sterling-logo.svg?v=8" type="image/svg+xml">
   <title>于の旅行侦探 YUNO Lyra Sterling</title>
-  <link rel="stylesheet" href="./styles.css?v=20261103-history1">
+  <link rel="stylesheet" href="./styles.css?v=20261103-share1">
   <script src="./assets/vendor/gsap.min.js" defer></script>
   <script src="./assets/vendor/lucide.min.js" defer></script>
   <script src="./app.js?v=20261103-history1" defer></script>
+  <script src="./share.js?v=20261103-1" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -20,6 +44,7 @@
     </a>
     <div class="topbar-right">
       <span class="source-label">Skyscanner 价格记录</span>
+      <button class="icon-button" id="share-button" title="分享网站" aria-label="分享网站"><i data-lucide="share-2"></i></button>
       <button class="icon-button" id="theme-toggle" title="切换深色模式" aria-label="切换深色模式"><i data-lucide="moon"></i></button>
     </div>
   </header>
@@ -40,6 +65,13 @@
       <span>价格随时变动，仅供走势参考</span>
     </footer>
   </main>
+  <dialog id="share-dialog" aria-labelledby="share-title" aria-describedby="share-description">
+    <div class="share-heading"><h2 id="share-title">分享网站</h2><button class="icon-button" id="share-close" title="关闭分享" aria-label="关闭分享"><i data-lucide="x"></i></button></div>
+    <div class="share-preview"><img src="./assets/share-icon.png?v=20261103-1" width="72" height="72" alt=""><div><strong>于の旅行侦探 · 机票价格监控</strong><p id="share-description">中国与日本机票价格监控，查看北京、东京、大阪多程方案，追踪历史价格与完整航班详情。</p></div></div>
+    <label class="sr-only" for="share-url">网站链接</label><input id="share-url" type="url" readonly spellcheck="false">
+    <div class="share-actions"><button class="share-copy" id="share-copy"><i data-lucide="copy"></i><span>复制链接</span></button><a id="share-qq" target="_blank" rel="noopener noreferrer"><i data-lucide="message-circle"></i>分享到 QQ</a></div>
+    <p class="share-feedback" id="share-feedback" role="status" aria-live="polite"></p>
+  </dialog>
   <noscript>请启用 JavaScript 以查看航班和价格图表。</noscript>
 </body>
 </html>

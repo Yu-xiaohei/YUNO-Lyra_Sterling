@@ -7,11 +7,14 @@
 - `index.html`：页面入口。
 - `styles.css`：桌面、平板、手机及深色样式。
 - `app.js`：任务切换、按日期查看历史方案、三级展示、图表与 GSAP 动效。
+- `share.js`：浏览器分享、复制链接、QQ 分享配置与可选微信签名接入。
+- `SHARING.md`：当前分享支持、微信安全域名和签名服务前提、对接格式及真机验证限制。
 - `data/prices.json`：唯一价格数据源，保留原始 4 条历史记录及 12 个方案，并将已有方案保存为 4 个按日快照。
 - `AI_DATA_UPDATE.md`：可直接交给另一个 AI 的数据更新说明，包含四项任务、字段、失败处理与 GitHub 写入约定。
 - `.nojekyll`：静态文件发布标记。
 - `assets/vendor/`：固定版本的 GSAP 3.15.0 和 Lucide 1.66.0。
 - `assets/YUNO-Lyra_Sterling-logo.svg`：用户提供的正式标志，按要求去掉底层黑色矩形，透明显示于页头和 favicon。
+- `assets/share-icon.png`：正式标志的 600 × 600 PNG 导出，用于客户端分享缩略图。
 - `assets/*.jpg`：东京、大阪、北京景色照片，本地保存。
 - `assets/photo-credits.json`：新增照片的作者、来源、许可和缩略图记录。
 
