@@ -1,4 +1,4 @@
-# 于の旅行侦探 YUNO Lyra Sterling
+# 于の旅行侦探
 
 可直接托管到 GitHub Pages 的静态网站。原始 HTML 未改动。
 
