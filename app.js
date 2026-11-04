@@ -34,6 +34,17 @@
   const motion = () => !!window.gsap && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const icons = () => window.lucide?.createIcons({ attrs: { "aria-hidden": "true" } });
   const numeric = n => typeof n === "number" && Number.isFinite(n);
+  const validTimestamp = value => typeof value === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(value) && Number.isFinite(Date.parse(value));
+  function updateStamp(id) {
+    const date = history(id).at(-1)?.date;
+    const value = state.data.snapshots?.find(row => row.task === id && row.date === date)?.updatedAt;
+    if (!validTimestamp(value)) return { time: "—", date: date ? `${date} · 未记录时间` : "未记录时间", value: "" };
+    const parts = Object.fromEntries(new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Asia/Shanghai", year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23"
+    }).formatToParts(new Date(value)).map(part => [part.type, part.value]));
+    return { time: `${parts.hour}:${parts.minute}:${parts.second}`, date: `${parts.year}-${parts.month}-${parts.day}`, value };
+  }
   function history(id) {
     return state.data.history.filter(row => row.task === id).map(row => ({ ...row, lowest: numeric(row.lowest) ? row.lowest : row.r1 })).sort((a, b) => a.date.localeCompare(b.date));
   }
@@ -129,7 +140,7 @@
   function metric(label, value, note, name) {
     return `<div class="metric"><div class="metric-label">${icon(name)}${label}</div><div class="metric-value">${value}</div><div class="metric-note">${note}</div></div>`;
   }
-  function renderPanel() {
+  function renderPanel(animate = true) {
     const task = tasks.find(t => t.id === state.task);
     const points = history(task.id), options = rows(task.id), last = points.at(-1), previous = points.at(-2);
     const low = last?.lowest, min = points.filter(p => numeric(p.lowest)).map(p => p.lowest);
@@ -139,6 +150,7 @@
     const values = options.map(r => r.price).filter(numeric);
     const spread = values.length > 1 ? Math.max(...values) - Math.min(...values) : null;
     const dateLabel = last?.date ?? "暂无数据";
+    const stamp = updateStamp(task.id);
     $("#task-panel").setAttribute("aria-labelledby", `tab-${task.id}`);
     $("#task-panel").innerHTML = `
       <div class="route-header reveal">
@@ -152,7 +164,7 @@
         ${metric("最新最低价", numeric(low) ? `<span class="currency">¥</span><span class="count-value" data-value="${low}">${low.toLocaleString("zh-CN")}</span>` : "—", esc(dateLabel), "ticket")}
         ${metric("较上次记录", differenceLabel, previous ? `对比 ${esc(previous.date)}` : "基准日 · 暂无对比记录", "arrow-down-up")}
         ${metric("历史最低价", numeric(allTime) ? `<span class="currency">¥</span>${allTime.toLocaleString("zh-CN")}` : "—", `本行程已记录 ${points.length} 天`, "chart-no-axes-combined")}
-        ${metric("今日候选", `${options.length}<small>个方案</small>`, `${new Set(options.map(r => r.airline)).size} 家航司 · 按价格排序`, "layers")}
+        ${metric("更新时间", `<time datetime="${esc(stamp.value)}" title="北京时间">${stamp.time}</time>`, esc(stamp.date), "clock-3")}
       </div>
       <div class="workspace reveal">
         <section class="chart-section" aria-labelledby="chart-heading">
@@ -182,7 +194,7 @@
         changeGallery(event.key === "ArrowRight" ? 1 : -1);
       }
     });
-    animateIn();
+    if (animate) animateIn();
   }
   function galleryCard(taskId) {
     const items = galleries[taskId], active = state.gallery[taskId] || 0;
@@ -368,6 +380,11 @@
       $("#task-panel").style.removeProperty("transform");
       renderPanel();
       state.switching = false;
+      if (pendingData) {
+        const next = pendingData;
+        pendingData = null;
+        applyData(next);
+      }
       const navTop = $(".task-nav").offsetTop;
       if (window.scrollY > navTop) window.scrollTo({ top: navTop, behavior: motion() ? "smooth" : "instant" });
       $("#live-status").textContent = `已切换到行程 ${id}：${tasks[id - 1].title}`;
@@ -437,6 +454,7 @@
   }
   function validate(data) {
     if (!data || data.schemaVersion !== 1 || !Array.isArray(data.history) || !Array.isArray(data.latest)) throw new Error("数据文件结构不正确");
+    if (data.updatedAt !== undefined && !validTimestamp(data.updatedAt)) throw new Error("更新时间必须包含日期、时分秒和时区");
     const seen = new Set();
     const validDate = date => typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date) && Number.isFinite(Date.parse(date)) && new Date(date).toISOString().slice(0, 10) === date;
     for (const row of data.history) {
@@ -459,6 +477,7 @@
       seen.clear();
       for (const snapshot of data.snapshots) {
         if (!snapshot || !validDate(snapshot.date) || !Number.isInteger(snapshot.task) || snapshot.task < 1 || snapshot.task > 4) throw new Error("历史方案日期或任务无效");
+        if (snapshot.updatedAt !== undefined && !validTimestamp(snapshot.updatedAt)) throw new Error("任务更新时间格式不正确");
         const key = `${snapshot.task}:${snapshot.date}`;
         const point = data.history.find(row => row.task === snapshot.task && row.date === snapshot.date);
         if (seen.has(key) || !point || !Array.isArray(snapshot.options) || snapshot.options.length < 1 || snapshot.options.length > 3) throw new Error("历史方案重复、缺少价格记录或方案数量无效");
@@ -475,23 +494,95 @@
       }
     }
   }
-  async function init() {
+  let pendingData = null, refreshJob = null, lastCheck = 0;
+  const remoteSource = location.hostname === "yu-xiaohei.github.io"
+    ? "https://raw.githubusercontent.com/Yu-xiaohei/YUNO-Lyra_Sterling/main/data/prices.json" : null;
+  async function readData(source) {
+    const url = new URL(source, location.href);
+    url.searchParams.set("_", Date.now());
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
     try {
-      const response = await fetch("./data/prices.json", { cache: "no-cache" });
+      const response = await fetch(url, { cache: "no-store", signal: controller.signal });
       if (!response.ok) throw new Error(`数据读取失败 (${response.status})`);
       const data = await response.json();
       validate(data);
-      state.data = data;
+      return data;
+    } finally { clearTimeout(timeout); }
+  }
+  function applyData(data) {
+    // A delayed CDN response must not roll back a newer, timestamped file.
+    if (validTimestamp(state.data?.updatedAt) &&
+      (!validTimestamp(data.updatedAt) || Date.parse(data.updatedAt) < Date.parse(state.data.updatedAt))) {
+      throw new Error("返回的数据版本早于当前记录");
+    }
+    if (state.switching) { pendingData = data; return; }
+    if (JSON.stringify(data) === JSON.stringify(state.data)) return;
+    const initial = !state.data;
+    const expanded = $$(".option-trigger[aria-expanded=true],.journey-trigger[aria-expanded=true]").map(button => button.id);
+    const focusId = document.activeElement?.id;
+    if (!initial) {
+      for (const task of tasks) {
+        if (state.recordDates[task.id] === history(task.id).at(-1)?.date) delete state.recordDates[task.id];
+      }
+      cleanup();
+    }
+    state.data = data;
+    if (initial) {
       const requested = Number(location.hash.match(/^#task-([1-4])$/)?.[1]);
       if (requested) state.task = requested;
-      const lastDate = [...data.history.map(row => row.date)].sort().at(-1);
-      $("#updated").textContent = lastDate ? `记录更新 ${lastDate.replaceAll("-", ".")}` : "暂无价格记录";
-      renderTabs(); renderPanel();
-    } catch (error) {
-      $("#updated").textContent = "数据暂不可用";
-      $("#task-panel").innerHTML = `<div class="error-state"><h2>暂时无法读取价格</h2><p>${esc(error.message)}</p><button id="retry">重新加载</button></div>`;
-      $("#retry").onclick = init;
     }
+    renderTabs(); renderPanel(initial);
+    for (const id of expanded) {
+      const button = document.getElementById(id);
+      if (button?.matches(".option-trigger,.journey-trigger")) {
+        button.setAttribute("aria-expanded", "true");
+        const region = document.getElementById(button.getAttribute("aria-controls"));
+        region.hidden = false;
+        region.inert = false;
+        region.classList.add("is-expanded");
+      }
+    }
+    if (focusId) document.getElementById(focusId)?.focus({ preventScroll: true });
+    if (!initial) $("#live-status").textContent = "航班数据已更新";
+  }
+  async function refreshData(force = false) {
+    if (refreshJob || (!force && (document.hidden || Date.now() - lastCheck < 5000))) return refreshJob;
+    lastCheck = Date.now();
+    refreshJob = (async () => {
+      let fallback = false;
+      let data;
+      try {
+        try { data = await readData(remoteSource || "./data/prices.json"); }
+        catch (error) {
+          // Published JSON is an initial offline fallback, never a replacement for live data.
+          if (!remoteSource || state.data) throw error;
+          data = await readData("./data/prices.json");
+          fallback = true;
+        }
+        applyData(data);
+        const lastDate = [...data.history.map(row => row.date)].sort().at(-1);
+        $("#updated").textContent = `${lastDate ? `记录更新 ${lastDate.replaceAll("-", ".")}` : "暂无价格记录"}${fallback ? " · 已发布版本，等待同步" : ""}`;
+      } catch (error) {
+        if (state.data) {
+          $("#updated").textContent = "更新检查失败 · 已保留上次有效数据";
+          return;
+        }
+        $("#updated").textContent = "数据暂不可用";
+        $("#task-panel").innerHTML = `<div class="error-state"><h2>暂时无法读取价格</h2><p>${esc(error.message)}</p><button id="retry">重新加载</button></div>`;
+        $("#retry").onclick = () => refreshData(true);
+      }
+    })();
+    try { await refreshJob; }
+    finally { refreshJob = null; }
+  }
+  function init() {
+    refreshData(true);
+    setInterval(() => refreshData(), 60000);
+    window.addEventListener("focus", () => refreshData());
+    window.addEventListener("online", () => refreshData(true));
+    window.addEventListener("pageshow", event => { if (event.persisted) refreshData(true); });
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) refreshData(); });
   }
   document.addEventListener("click", event => {
     const recordStep = event.target.closest("[data-record-step]");
