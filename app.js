@@ -31,6 +31,17 @@
   const disclosureJobs = new Map();
   let panelContext = null;
   let archiveContext = null;
+  let priceContext = null;
+  let recordContext = null;
+  let timeContext = null;
+  let countContext = null;
+  const metricHoverJobs = new Map(), metricReplayTimes = new WeakMap();
+  let metricGesture = null;
+  function clearMetricInteractions() {
+    metricHoverJobs.forEach(clearTimeout);
+    metricHoverJobs.clear();
+    metricGesture = null;
+  }
   const motion = () => !!window.gsap && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const icons = () => window.lucide?.createIcons({ attrs: { "aria-hidden": "true" } });
   const numeric = n => typeof n === "number" && Number.isFinite(n);
@@ -41,9 +52,9 @@
     if (!validTimestamp(value)) return { time: "—", date: date ? `${date} · 未记录时间` : "未记录时间", value: "" };
     const parts = Object.fromEntries(new Intl.DateTimeFormat("en-GB", {
       timeZone: "Asia/Shanghai", year: "numeric", month: "2-digit", day: "2-digit",
-      hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23"
+      hour: "2-digit", minute: "2-digit", hourCycle: "h23"
     }).formatToParts(new Date(value)).map(part => [part.type, part.value]));
-    return { time: `${parts.hour}:${parts.minute}:${parts.second}`, date: `${parts.year}-${parts.month}-${parts.day}`, value };
+    return { time: `${parts.hour}:${parts.minute}`, date: `${parts.year}-${parts.month}-${parts.day}`, value };
   }
   function history(id) {
     return state.data.history.filter(row => row.task === id).map(row => ({ ...row, lowest: numeric(row.lowest) ? row.lowest : row.r1 })).sort((a, b) => a.date.localeCompare(b.date));
@@ -99,6 +110,11 @@
   }
   function reducedFinal() {
     if (!motion()) {
+      clearMetricInteractions();
+      countContext?.revert(); countContext = null;
+      priceContext?.revert(); priceContext = null;
+      recordContext?.revert(); recordContext = null;
+      timeContext?.revert(); timeContext = null;
       panelContext?.revert(); panelContext = null;
       archiveContext?.revert(); archiveContext = null;
       const counter = $(".count-value");
@@ -117,6 +133,11 @@
     }
   }
   function cleanup() {
+    clearMetricInteractions();
+    countContext?.revert(); countContext = null;
+    priceContext?.revert(); priceContext = null;
+    recordContext?.revert(); recordContext = null;
+    timeContext?.revert(); timeContext = null;
     for (const region of disclosureJobs.keys()) stopDisclosureJob(region);
     panelContext?.revert(); panelContext = null;
     archiveContext?.revert(); archiveContext = null;
@@ -137,16 +158,18 @@
       nav.scrollTo({ left: tab.offsetLeft - (nav.clientWidth - tab.offsetWidth) / 2, behavior: animate && motion() ? "smooth" : "instant" });
     }
   }
-  function metric(label, value, note, name) {
-    return `<div class="metric"><div class="metric-label">${icon(name)}${label}</div><div class="metric-value">${value}</div><div class="metric-note">${note}</div></div>`;
+  function metric(label, value, note, name, kind = "") {
+    return `<div class="metric"${kind ? ` data-metric="${kind}"` : ""}><div class="metric-label">${icon(name)}${label}</div><div class="metric-value">${value}</div><div class="metric-note">${note}</div></div>`;
   }
-  function renderPanel(animate = true) {
+  function renderPanel(animate = true, animateChange = true) {
     const task = tasks.find(t => t.id === state.task);
     const points = history(task.id), options = rows(task.id), last = points.at(-1), previous = points.at(-2);
     const low = last?.lowest, min = points.filter(p => numeric(p.lowest)).map(p => p.lowest);
     const allTime = min.length ? Math.min(...min) : null;
     const difference = numeric(low) && numeric(previous?.lowest) ? low - previous.lowest : null;
-    const differenceLabel = difference === null ? "—" : difference === 0 ? "持平" : `${difference > 0 ? "+" : "−"}${money(Math.abs(difference))}`;
+    const differenceLabel = difference === null ? "—" : difference === 0
+      ? '<span class="price-change price-flat">价格持平</span>'
+      : `<span class="price-change ${difference > 0 ? "price-up" : "price-down"}"><span class="sr-only">${difference > 0 ? "上涨" : "下降"}</span><span>${money(Math.abs(difference))}</span>${icon(difference > 0 ? "arrow-up" : "arrow-down")}</span>`;
     const values = options.map(r => r.price).filter(numeric);
     const spread = values.length > 1 ? Math.max(...values) - Math.min(...values) : null;
     const dateLabel = last?.date ?? "暂无数据";
@@ -161,10 +184,10 @@
         ${galleryCard(task.id)}
       </div>
       <div class="metrics reveal">
-        ${metric("当日最低价", numeric(low) ? `<span class="currency">¥</span><span class="count-value" data-value="${low}">${low.toLocaleString("zh-CN")}</span>` : "—", esc(dateLabel), "ticket")}
-        ${metric("较上次记录", differenceLabel, previous ? `对比 ${esc(previous.date)}` : "基准日 · 暂无对比记录", "arrow-down-up")}
-        ${metric("历史最低价", numeric(allTime) ? `<span class="currency">¥</span>${allTime.toLocaleString("zh-CN")}` : "—", `本行程已记录 ${points.length} 天`, "chart-no-axes-combined")}
-        ${metric("更新时间", `<time datetime="${esc(stamp.value)}" title="北京时间">${stamp.time}</time>`, esc(stamp.date), "clock-3")}
+        ${metric("当日最低价", numeric(low) ? `<span class="currency">¥</span><span class="count-value" data-value="${low}">${low.toLocaleString("zh-CN")}</span>` : "—", esc(dateLabel), "ticket", "current")}
+        ${metric("较上次记录", differenceLabel, previous ? `对比 ${esc(previous.date)}` : "基准日 · 暂无对比记录", "arrow-down-up", "change")}
+        ${metric("历史最低价", numeric(allTime) ? `<span class="record-value"><span class="currency">¥</span>${allTime.toLocaleString("zh-CN")}<span class="record-underline" aria-hidden="true"></span></span>` : "—", `本行程已记录 ${points.length} 天`, "chart-no-axes-combined", "record")}
+        ${metric("更新时间", `<time class="updated-time" datetime="${esc(stamp.value)}" title="北京时间">${stamp.value ? `<span class="time-digit">${stamp.time.slice(0, 2)}</span><span>:</span><span class="time-digit">${stamp.time.slice(3)}</span>` : stamp.time}</time>`, esc(stamp.date), "clock-3", "updated")}
       </div>
       <div class="workspace reveal">
         <section class="chart-section" aria-labelledby="chart-heading">
@@ -195,6 +218,9 @@
       }
     });
     if (animate) animateIn();
+    if (animateChange) animatePriceChange(animate ? .32 : 0);
+    if (animateChange) animateRelatedMetrics(true, true, animate ? .4 : 0);
+    if (animateChange) animateCurrentLow(animate ? .28 : 0);
   }
   function galleryCard(taskId) {
     const items = galleries[taskId], active = state.gallery[taskId] || 0;
@@ -344,6 +370,92 @@
       gsap.fromTo(path, { strokeDasharray: length, strokeDashoffset: length }, { strokeDashoffset: 0, duration: .9, ease: "power2.out", clearProps: "strokeDasharray,strokeDashoffset" });
     });
   }
+  function animateCurrentLow(delay = 0) {
+    countContext?.revert(); countContext = null;
+    const counter = $(".count-value");
+    if (!motion() || !counter) return;
+    countContext = gsap.context(() => {
+      const value = +counter.dataset.value, number = { value: value * .85 };
+      const tl = gsap.timeline({ id: "current-low", delay });
+      gsap.set(counter, { willChange: "transform,opacity" });
+      tl.fromTo(counter, { y: 5, opacity: .6 }, { y: 0, opacity: 1, duration: .4, ease: "power2.out" }, 0)
+        .to(number, { value, duration: .75, ease: "power3.out",
+          onUpdate: () => { counter.textContent = Math.round(number.value).toLocaleString("zh-CN"); } }, 0)
+        .set(counter, { clearProps: "transform,opacity,willChange" });
+    }, counter);
+  }
+  function replayMetric(metric) {
+    if (!metric.isConnected || !motion() || state.switching || document.hidden) return;
+    const kind = metric.dataset.metric, ids = { current: "current-low", change: "price-change", record: "record-low", updated: "update-time" };
+    const timeline = gsap.getById(ids[kind]);
+    if (timeline && timeline.totalProgress() < 1) return;
+    const now = performance.now();
+    if (now - (metricReplayTimes.get(metric) ?? -Infinity) < 1100) return;
+    metricReplayTimes.set(metric, now);
+    if (kind === "current") animateCurrentLow();
+    else if (kind === "change") animatePriceChange();
+    else animateRelatedMetrics(kind === "record", kind === "updated");
+  }
+  function animatePriceChange(delay = 0) {
+    priceContext?.revert(); priceContext = null;
+    const element = $(".price-change");
+    if (!motion() || !element) return;
+    priceContext = gsap.context(() => {
+      const arrow = $("svg", element), targets = arrow ? [element, arrow] : [element];
+      gsap.set(targets, { willChange: "transform,opacity" });
+      const tl = gsap.timeline({ id: "price-change", delay });
+      if (element.classList.contains("price-up")) {
+        tl.fromTo(element, { y: 7, opacity: .55 }, { y: 0, opacity: 1, duration: .45, ease: "back.out(1.4)" })
+          .to(arrow, { y: -6, duration: .3, ease: "power2.out" }, .12)
+          .to(arrow, { y: 0, duration: .45, ease: "bounce.out" }, .42)
+          .fromTo(element, { scale: 1.035 }, { scale: 1, duration: .45, ease: "power2.out" }, .4);
+      } else if (element.classList.contains("price-down")) {
+        tl.fromTo(element, { y: -7, opacity: .5 }, { y: 0, opacity: 1, duration: .65, ease: "power2.out" })
+          .to(arrow, { y: 6, duration: .35, ease: "power2.inOut" }, .12)
+          .to(arrow, { y: 0, duration: .55, ease: "power2.out" }, .47);
+      } else {
+        tl.fromTo(element, { opacity: .45 }, { opacity: 1, duration: .55, repeat: 1, yoyo: true, ease: "sine.inOut" })
+          .to(element, { opacity: 1, duration: .35, ease: "sine.out" });
+      }
+      tl.set(targets, { clearProps: "transform,opacity,willChange" });
+    }, element);
+  }
+  function animateRelatedMetrics(record = true, time = true, delay = 0) {
+    if (!motion()) return;
+    const recordMetric = $('[data-metric="record"]'), timeMetric = $('[data-metric="updated"]');
+    if (record && $(".record-value", recordMetric)) {
+      recordContext?.revert();
+      recordContext = gsap.context(() => {
+        const value = $(".record-value", recordMetric), underline = $(".record-underline", recordMetric);
+        const paths = $$(".metric-label svg path,.metric-label svg line,.metric-label svg polyline", recordMetric);
+        const tl = gsap.timeline({ id: "record-low", delay });
+        gsap.set(value, { willChange: "opacity" });
+        gsap.set(underline, { willChange: "transform" });
+        paths.forEach((path, index) => {
+          const length = path.getTotalLength();
+          tl.fromTo(path, { strokeDasharray: length, strokeDashoffset: length },
+            { strokeDashoffset: 0, duration: .6, ease: "power2.out", clearProps: "strokeDasharray,strokeDashoffset" }, index * .07);
+        });
+        tl.fromTo(value, { opacity: .4 }, { opacity: 1, duration: .55, ease: "power2.out" }, .2)
+          .fromTo(underline, { scaleX: 0, transformOrigin: "left center" }, { scaleX: 1, duration: .5, ease: "power2.inOut" }, .2)
+          .to(underline, { scaleX: 0, transformOrigin: "right center", duration: .4, ease: "power2.inOut" }, .85)
+          .set([value, underline], { clearProps: "transform,opacity,willChange" });
+      }, recordMetric);
+    }
+    if (time && $(".time-digit", timeMetric)) {
+      timeContext?.revert();
+      timeContext = gsap.context(() => {
+        const digits = $$(".time-digit", timeMetric), hands = $(".metric-label svg path,.metric-label svg polyline", timeMetric);
+        const targets = hands ? [...digits, hands] : digits;
+        const tl = gsap.timeline({ id: "update-time", delay });
+        gsap.set(targets, { willChange: "transform,opacity" });
+        if (hands) tl.fromTo(hands, { rotation: -360, svgOrigin: "12 12" }, { rotation: 0, duration: .9, ease: "power2.out" }, 0);
+        tl.fromTo(digits, { rotationX: -75, y: 6, opacity: .2, transformOrigin: "center bottom" },
+          { rotationX: 0, y: 0, opacity: 1, duration: .55, stagger: .12, ease: "back.out(1.2)" }, .12)
+          .set(targets, { clearProps: "transform,opacity,willChange" });
+      }, timeMetric);
+    }
+  }
   function animateIn() {
     if (!motion()) return;
     panelContext = gsap.context(() => {
@@ -352,11 +464,6 @@
       tl.from(".option-row", { y: 10, opacity: 0, duration: .4, stagger: .065 }, .25);
       tl.from(".bar-fill", { scaleX: 0, duration: .85, stagger: .08, ease: "power2.out" }, .2);
       tl.from(".scenery-slide:not([hidden]) img", { scale: 1.05, duration: 1.1 }, 0);
-      const counter = $(".count-value");
-      if (counter) {
-        const number = { value: +counter.dataset.value * .85 };
-        tl.to(number, { value: +counter.dataset.value, duration: .8, onUpdate: () => { counter.textContent = Math.round(number.value).toLocaleString("zh-CN"); } }, .12);
-      }
       animateChart();
     }, $("#task-panel"));
   }
@@ -519,6 +626,10 @@
     if (state.switching) { pendingData = data; return; }
     if (JSON.stringify(data) === JSON.stringify(state.data)) return;
     const initial = !state.data;
+    const previousChange = $(".price-change")?.textContent;
+    const previousRecord = $(".record-value")?.textContent;
+    const previousTime = $('[data-metric="updated"]')?.textContent;
+    const previousCurrent = $(".count-value")?.dataset.value;
     const expanded = $$(".option-trigger[aria-expanded=true],.journey-trigger[aria-expanded=true]").map(button => button.id);
     const focusId = document.activeElement?.id;
     if (!initial) {
@@ -532,7 +643,11 @@
       const requested = Number(location.hash.match(/^#task-([1-4])$/)?.[1]);
       if (requested) state.task = requested;
     }
-    renderTabs(); renderPanel(initial);
+    renderTabs(); renderPanel(initial, false);
+    if (initial || previousChange !== $(".price-change")?.textContent) animatePriceChange(initial ? .32 : 0);
+    animateRelatedMetrics(initial || previousRecord !== $(".record-value")?.textContent,
+      initial || previousTime !== $('[data-metric="updated"]')?.textContent, initial ? .4 : 0);
+    if (initial || previousCurrent !== $(".count-value")?.dataset.value) animateCurrentLow(initial ? .28 : 0);
     for (const id of expanded) {
       const button = document.getElementById(id);
       if (button?.matches(".option-trigger,.journey-trigger")) {
@@ -584,6 +699,34 @@
     window.addEventListener("pageshow", event => { if (event.persisted) refreshData(true); });
     document.addEventListener("visibilitychange", () => { if (!document.hidden) refreshData(); });
   }
+  document.addEventListener("pointerover", event => {
+    const metric = event.target.closest(".metric[data-metric]");
+    if (event.pointerType !== "mouse" || !metric || metric.contains(event.relatedTarget)) return;
+    clearTimeout(metricHoverJobs.get(metric));
+    metricHoverJobs.set(metric, setTimeout(() => { metricHoverJobs.delete(metric); replayMetric(metric); }, 120));
+  }, { passive: true });
+  document.addEventListener("pointerout", event => {
+    const metric = event.target.closest(".metric[data-metric]");
+    if (!metric || metric.contains(event.relatedTarget)) return;
+    clearTimeout(metricHoverJobs.get(metric));
+    metricHoverJobs.delete(metric);
+  }, { passive: true });
+  document.addEventListener("pointerdown", event => {
+    if (event.pointerType === "mouse") return;
+    const metric = event.target.closest(".metric[data-metric]");
+    metricGesture = event.isPrimary && metric ? { metric, id: event.pointerId, x: event.clientX, y: event.clientY, start: performance.now(), moved: false } : null;
+  }, { passive: true });
+  document.addEventListener("pointermove", event => {
+    if (metricGesture?.id === event.pointerId &&
+      Math.hypot(event.clientX - metricGesture.x, event.clientY - metricGesture.y) > 10) metricGesture.moved = true;
+  }, { passive: true });
+  document.addEventListener("pointercancel", () => { metricGesture = null; }, { passive: true });
+  document.addEventListener("pointerup", event => {
+    const gesture = metricGesture;
+    metricGesture = null;
+    if (!gesture || gesture.id !== event.pointerId || gesture.moved || performance.now() - gesture.start > 600) return;
+    if (event.target.closest(".metric[data-metric]") === gesture.metric) replayMetric(gesture.metric);
+  }, { passive: true });
   document.addEventListener("click", event => {
     const recordStep = event.target.closest("[data-record-step]");
     if (recordStep && !recordStep.disabled) {

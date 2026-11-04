@@ -79,6 +79,18 @@ h2{font-size:25px;line-height:1.4;margin:0;font-weight:650}
 .metric:first-child .metric-value{color:var(--accent)}
 .metric-value small{font-size:13px;font-weight:500;margin-left:3px}
 .metric-value .currency{font-size:17px;margin-right:2px}
+.price-change{display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+.price-change svg.lucide{width:16px;height:22px;stroke-width:2.8}
+.metric{touch-action:manipulation}
+.price-up{color:#c53643}
+.price-down{color:#197448}
+.price-flat{color:var(--muted)}
+:root[data-theme=dark] .price-up{color:#ff8790}
+:root[data-theme=dark] .price-down{color:#78d6a3}
+.record-value{display:inline-flex;align-items:baseline;position:relative}
+.record-underline{position:absolute;left:0;right:0;bottom:-4px;height:2px;background:var(--accent);transform:scaleX(0)}
+.updated-time{display:inline-flex;perspective:240px;white-space:nowrap}
+.time-digit{display:inline-block}
 .metric-note{font-size:10px;color:var(--muted);margin-top:7px}
 .workspace{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(240px,1fr);gap:28px;margin-bottom:24px}
 .section-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
