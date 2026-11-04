@@ -161,7 +161,7 @@
         ${galleryCard(task.id)}
       </div>
       <div class="metrics reveal">
-        ${metric("最新最低价", numeric(low) ? `<span class="currency">¥</span><span class="count-value" data-value="${low}">${low.toLocaleString("zh-CN")}</span>` : "—", esc(dateLabel), "ticket")}
+        ${metric("当日最低价", numeric(low) ? `<span class="currency">¥</span><span class="count-value" data-value="${low}">${low.toLocaleString("zh-CN")}</span>` : "—", esc(dateLabel), "ticket")}
         ${metric("较上次记录", differenceLabel, previous ? `对比 ${esc(previous.date)}` : "基准日 · 暂无对比记录", "arrow-down-up")}
         ${metric("历史最低价", numeric(allTime) ? `<span class="currency">¥</span>${allTime.toLocaleString("zh-CN")}` : "—", `本行程已记录 ${points.length} 天`, "chart-no-axes-combined")}
         ${metric("更新时间", `<time datetime="${esc(stamp.value)}" title="北京时间">${stamp.time}</time>`, esc(stamp.date), "clock-3")}
