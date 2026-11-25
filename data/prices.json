@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-24T11:05:14+08:00",
+  "updatedAt": "2026-11-25T11:03:29+08:00",
   "history": [
     {
       "date": "2026-11-03",
@@ -705,13 +705,45 @@
       "r1": 2554,
       "r2": 2680,
       "r3": 3290
+    },
+    {
+      "date": "2026-11-25",
+      "task": 1,
+      "lowest": 2607,
+      "r1": 2607,
+      "r2": 2607,
+      "r3": 2707
+    },
+    {
+      "date": "2026-11-25",
+      "task": 2,
+      "lowest": 3580,
+      "r1": 3580,
+      "r2": 3580,
+      "r3": 3680
+    },
+    {
+      "date": "2026-11-25",
+      "task": 3,
+      "lowest": 2896,
+      "r1": 2896,
+      "r2": 2896,
+      "r3": 2898
+    },
+    {
+      "date": "2026-11-25",
+      "task": 4,
+      "lowest": 2690,
+      "r1": 2690,
+      "r2": 2788,
+      "r3": 3447
     }
   ],
   "latest": [
     {
       "task": 1,
       "rank": 1,
-      "price": 2603,
+      "price": 2607,
       "airline": "国航 Air China",
       "baggage": "2件托运行李 included",
       "legs": [
@@ -740,19 +772,19 @@
     {
       "task": 1,
       "rank": 2,
-      "price": 2694,
+      "price": 2607,
       "airline": "国航 Air China",
       "baggage": "2件托运行李 included",
       "legs": [
         {
           "journey": 1,
           "date": "2026-12-20",
-          "dep": "9:55",
+          "dep": "15:30",
           "from": "PEK",
-          "arr": "14:25",
+          "arr": "19:50",
           "to": "HND",
-          "duration": "3小时30分",
-          "seat": "A321neo 3-3 31英寸"
+          "duration": "3小时20分",
+          "seat": "A330 2-4-2 31英寸"
         },
         {
           "journey": 2,
@@ -769,37 +801,36 @@
     {
       "task": 1,
       "rank": 3,
-      "price": 2753,
+      "price": 2707,
       "airline": "国航 Air China",
       "baggage": "2件托运行李 included",
       "legs": [
         {
           "journey": 1,
           "date": "2026-12-20",
-          "dep": "17:15",
+          "dep": "09:55",
           "from": "PEK",
-          "arr": "21:30",
+          "arr": "14:25",
           "to": "HND",
-          "duration": "3小时15分",
-          "seat": "A330 2-4-2 31英寸"
+          "duration": "3小时30分",
+          "seat": "A321neo 3-3 31英寸"
         },
         {
           "journey": 2,
           "date": "2026-12-30",
-          "dep": "21:00",
+          "dep": "18:00",
           "from": "HND",
-          "arr": "00:10",
+          "arr": "21:10",
           "to": "PEK",
           "duration": "4小时10分",
-          "seat": "",
-          "arrDate": "2026-12-31"
+          "seat": "A321neo 3-3 31英寸"
         }
       ]
     },
     {
       "task": 2,
       "rank": 1,
-      "price": 3264,
+      "price": 3580,
       "airline": "国航 Air China + 星悦航空 Star Flyer",
       "baggage": "2件托运行李 included，每件≤23kg（手提行李信息未知）",
       "legs": [
@@ -816,7 +847,7 @@
         {
           "journey": 2,
           "date": "2026-12-25",
-          "dep": "8:45",
+          "dep": "08:45",
           "from": "HND",
           "arr": "10:15",
           "to": "KIX",
@@ -838,24 +869,24 @@
     {
       "task": 2,
       "rank": 2,
-      "price": 3364,
+      "price": 3580,
       "airline": "国航 Air China + 星悦航空 Star Flyer",
       "baggage": "2件托运行李 included，每件≤23kg（手提行李信息未知）",
       "legs": [
         {
           "journey": 1,
           "date": "2026-12-20",
-          "dep": "9:55",
+          "dep": "15:30",
           "from": "PEK",
-          "arr": "14:25",
+          "arr": "19:50",
           "to": "HND",
-          "duration": "3小时30分",
-          "seat": "A321neo 3-3 31英寸"
+          "duration": "3小时20分",
+          "seat": "A330 2-4-2 31英寸"
         },
         {
           "journey": 2,
           "date": "2026-12-25",
-          "dep": "8:45",
+          "dep": "08:45",
           "from": "HND",
           "arr": "10:15",
           "to": "KIX",
@@ -877,24 +908,24 @@
     {
       "task": 2,
       "rank": 3,
-      "price": 3534,
+      "price": 3680,
       "airline": "国航 Air China + 星悦航空 Star Flyer",
       "baggage": "2件托运行李 included，每件≤23kg（手提行李信息未知）",
       "legs": [
         {
           "journey": 1,
           "date": "2026-12-20",
-          "dep": "8:40",
+          "dep": "09:55",
           "from": "PEK",
-          "arr": "12:50",
+          "arr": "14:25",
           "to": "HND",
-          "duration": "3小时10分",
-          "seat": "A330 2-4-2 31英寸"
+          "duration": "3小时30分",
+          "seat": "A321neo 3-3 31英寸"
         },
         {
           "journey": 2,
           "date": "2026-12-25",
-          "dep": "8:45",
+          "dep": "08:45",
           "from": "HND",
           "arr": "10:15",
           "to": "KIX",
@@ -916,7 +947,7 @@
     {
       "task": 3,
       "rank": 1,
-      "price": 2897,
+      "price": 2896,
       "airline": "全日空 ANA",
       "baggage": "2件托运行李 included",
       "legs": [
@@ -933,9 +964,9 @@
         {
           "journey": 2,
           "date": "2026-12-25",
-          "dep": "7:05",
+          "dep": "07:05",
           "from": "UKB",
-          "arr": "8:15",
+          "arr": "08:15",
           "to": "HND",
           "duration": "1小时10分",
           "seat": "A321 3-3 31英寸"
@@ -955,7 +986,7 @@
     {
       "task": 3,
       "rank": 2,
-      "price": 2897,
+      "price": 2896,
       "airline": "全日空 ANA",
       "baggage": "2件托运行李 included",
       "legs": [
@@ -994,7 +1025,7 @@
     {
       "task": 3,
       "rank": 3,
-      "price": 2899,
+      "price": 2898,
       "airline": "全日空 ANA",
       "baggage": "2件托运行李 included",
       "legs": [
@@ -1011,9 +1042,9 @@
         {
           "journey": 2,
           "date": "2026-12-25",
-          "dep": "7:05",
+          "dep": "07:05",
           "from": "ITM",
-          "arr": "8:10",
+          "arr": "08:10",
           "to": "HND",
           "duration": "1小时05分",
           "seat": "A321 3-3 31英寸"
@@ -1033,14 +1064,43 @@
     {
       "task": 4,
       "rank": 1,
-      "price": 2554,
+      "price": 2690,
       "airline": "全日空 ANA",
       "baggage": "2件托运行李 included",
       "legs": [
         {
           "journey": 1,
           "date": "2027-07-05",
-          "dep": "8:20",
+          "dep": "08:20",
+          "from": "PEK",
+          "arr": "12:55",
+          "to": "HND",
+          "duration": "3小时35分",
+          "seat": "767 2-3-2 31英寸"
+        },
+        {
+          "journey": 2,
+          "date": "2027-07-18",
+          "dep": "08:55",
+          "from": "HND",
+          "arr": "12:00",
+          "to": "PEK",
+          "duration": "4小时05分",
+          "seat": "777 2-4-3 34英寸"
+        }
+      ]
+    },
+    {
+      "task": 4,
+      "rank": 2,
+      "price": 2788,
+      "airline": "全日空 ANA",
+      "baggage": "2件托运行李 included",
+      "legs": [
+        {
+          "journey": 1,
+          "date": "2027-07-05",
+          "dep": "08:20",
           "from": "PEK",
           "arr": "12:55",
           "to": "HND",
@@ -1061,37 +1121,8 @@
     },
     {
       "task": 4,
-      "rank": 2,
-      "price": 2680,
-      "airline": "全日空 ANA",
-      "baggage": "2件托运行李 included",
-      "legs": [
-        {
-          "journey": 1,
-          "date": "2027-07-05",
-          "dep": "8:20",
-          "from": "PEK",
-          "arr": "12:55",
-          "to": "HND",
-          "duration": "3小时35分",
-          "seat": "767 2-3-2 31英寸"
-        },
-        {
-          "journey": 2,
-          "date": "2027-07-18",
-          "dep": "8:55",
-          "from": "HND",
-          "arr": "12:00",
-          "to": "PEK",
-          "duration": "4小时05分",
-          "seat": "777 2-4-3 34英寸"
-        }
-      ]
-    },
-    {
-      "task": 4,
       "rank": 3,
-      "price": 3290,
+      "price": 3447,
       "airline": "全日空 ANA",
       "baggage": "2件托运行李 included",
       "legs": [
@@ -1108,12 +1139,12 @@
         {
           "journey": 2,
           "date": "2027-07-18",
-          "dep": "17:15",
+          "dep": "08:55",
           "from": "HND",
-          "arr": "20:15",
+          "arr": "12:00",
           "to": "PEK",
-          "duration": "4小时",
-          "seat": "767 2-3-2 31英寸"
+          "duration": "4小时05分",
+          "seat": "777 2-4-3 34英寸"
         }
       ]
     }
@@ -10887,6 +10918,442 @@
               "to": "PEK",
               "duration": "4小时",
               "seat": "767 2-3-2 31英寸"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-11-25",
+      "task": 1,
+      "updatedAt": "2026-11-25T11:03:29+08:00",
+      "options": [
+        {
+          "task": 1,
+          "rank": 1,
+          "price": 2607,
+          "airline": "国航 Air China",
+          "baggage": "2件托运行李 included",
+          "legs": [
+            {
+              "journey": 1,
+              "date": "2026-12-20",
+              "dep": "17:15",
+              "from": "PEK",
+              "arr": "21:30",
+              "to": "HND",
+              "duration": "3小时15分",
+              "seat": "A330 2-4-2 31英寸"
+            },
+            {
+              "journey": 2,
+              "date": "2026-12-30",
+              "dep": "18:00",
+              "from": "HND",
+              "arr": "21:10",
+              "to": "PEK",
+              "duration": "4小时10分",
+              "seat": "A321neo 3-3 31英寸"
+            }
+          ]
+        },
+        {
+          "task": 1,
+          "rank": 2,
+          "price": 2607,
+          "airline": "国航 Air China",
+          "baggage": "2件托运行李 included",
+          "legs": [
+            {
+              "journey": 1,
+              "date": "2026-12-20",
+              "dep": "15:30",
+              "from": "PEK",
+              "arr": "19:50",
+              "to": "HND",
+              "duration": "3小时20分",
+              "seat": "A330 2-4-2 31英寸"
+            },
+            {
+              "journey": 2,
+              "date": "2026-12-30",
+              "dep": "18:00",
+              "from": "HND",
+              "arr": "21:10",
+              "to": "PEK",
+              "duration": "4小时10分",
+              "seat": "A321neo 3-3 31英寸"
+            }
+          ]
+        },
+        {
+          "task": 1,
+          "rank": 3,
+          "price": 2707,
+          "airline": "国航 Air China",
+          "baggage": "2件托运行李 included",
+          "legs": [
+            {
+              "journey": 1,
+              "date": "2026-12-20",
+              "dep": "09:55",
+              "from": "PEK",
+              "arr": "14:25",
+              "to": "HND",
+              "duration": "3小时30分",
+              "seat": "A321neo 3-3 31英寸"
+            },
+            {
+              "journey": 2,
+              "date": "2026-12-30",
+              "dep": "18:00",
+              "from": "HND",
+              "arr": "21:10",
+              "to": "PEK",
+              "duration": "4小时10分",
+              "seat": "A321neo 3-3 31英寸"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-11-25",
+      "task": 2,
+      "updatedAt": "2026-11-25T11:03:29+08:00",
+      "options": [
+        {
+          "task": 2,
+          "rank": 1,
+          "price": 3580,
+          "airline": "国航 Air China + 星悦航空 Star Flyer",
+          "baggage": "2件托运行李 included，每件≤23kg（手提行李信息未知）",
+          "legs": [
+            {
+              "journey": 1,
+              "date": "2026-12-20",
+              "dep": "17:15",
+              "from": "PEK",
+              "arr": "21:30",
+              "to": "HND",
+              "duration": "3小时15分",
+              "seat": "A330 2-4-2 31英寸"
+            },
+            {
+              "journey": 2,
+              "date": "2026-12-25",
+              "dep": "08:45",
+              "from": "HND",
+              "arr": "10:15",
+              "to": "KIX",
+              "duration": "1小时30分",
+              "seat": "A320 3-3 34英寸"
+            },
+            {
+              "journey": 3,
+              "date": "2026-12-30",
+              "dep": "13:50",
+              "from": "KIX",
+              "arr": "16:15",
+              "to": "PEK",
+              "duration": "3小时25分",
+              "seat": "A330 2-4-2 31英寸"
+            }
+          ]
+        },
+        {
+          "task": 2,
+          "rank": 2,
+          "price": 3580,
+          "airline": "国航 Air China + 星悦航空 Star Flyer",
+          "baggage": "2件托运行李 included，每件≤23kg（手提行李信息未知）",
+          "legs": [
+            {
+              "journey": 1,
+              "date": "2026-12-20",
+              "dep": "15:30",
+              "from": "PEK",
+              "arr": "19:50",
+              "to": "HND",
+              "duration": "3小时20分",
+              "seat": "A330 2-4-2 31英寸"
+            },
+            {
+              "journey": 2,
+              "date": "2026-12-25",
+              "dep": "08:45",
+              "from": "HND",
+              "arr": "10:15",
+              "to": "KIX",
+              "duration": "1小时30分",
+              "seat": "A320 3-3 34英寸"
+            },
+            {
+              "journey": 3,
+              "date": "2026-12-30",
+              "dep": "13:50",
+              "from": "KIX",
+              "arr": "16:15",
+              "to": "PEK",
+              "duration": "3小时25分",
+              "seat": "A330 2-4-2 31英寸"
+            }
+          ]
+        },
+        {
+          "task": 2,
+          "rank": 3,
+          "price": 3680,
+          "airline": "国航 Air China + 星悦航空 Star Flyer",
+          "baggage": "2件托运行李 included，每件≤23kg（手提行李信息未知）",
+          "legs": [
+            {
+              "journey": 1,
+              "date": "2026-12-20",
+              "dep": "09:55",
+              "from": "PEK",
+              "arr": "14:25",
+              "to": "HND",
+              "duration": "3小时30分",
+              "seat": "A321neo 3-3 31英寸"
+            },
+            {
+              "journey": 2,
+              "date": "2026-12-25",
+              "dep": "08:45",
+              "from": "HND",
+              "arr": "10:15",
+              "to": "KIX",
+              "duration": "1小时30分",
+              "seat": "A320 3-3 34英寸"
+            },
+            {
+              "journey": 3,
+              "date": "2026-12-30",
+              "dep": "13:50",
+              "from": "KIX",
+              "arr": "16:15",
+              "to": "PEK",
+              "duration": "3小时25分",
+              "seat": "A330 2-4-2 31英寸"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-11-25",
+      "task": 3,
+      "updatedAt": "2026-11-25T11:03:29+08:00",
+      "options": [
+        {
+          "task": 3,
+          "rank": 1,
+          "price": 2896,
+          "airline": "全日空 ANA",
+          "baggage": "2件托运行李 included",
+          "legs": [
+            {
+              "journey": 1,
+              "date": "2026-12-20",
+              "dep": "14:25",
+              "from": "PEK",
+              "arr": "18:25",
+              "to": "KIX",
+              "duration": "3小时",
+              "seat": "767 2-3-2 31英寸"
+            },
+            {
+              "journey": 2,
+              "date": "2026-12-25",
+              "dep": "07:05",
+              "from": "UKB",
+              "arr": "08:15",
+              "to": "HND",
+              "duration": "1小时10分",
+              "seat": "A321 3-3 31英寸"
+            },
+            {
+              "journey": 3,
+              "date": "2026-12-30",
+              "dep": "17:25",
+              "from": "HND",
+              "arr": "20:45",
+              "to": "PEK",
+              "duration": "4小时20分",
+              "seat": "787 3-3-3 34英寸"
+            }
+          ]
+        },
+        {
+          "task": 3,
+          "rank": 2,
+          "price": 2896,
+          "airline": "全日空 ANA",
+          "baggage": "2件托运行李 included",
+          "legs": [
+            {
+              "journey": 1,
+              "date": "2026-12-20",
+              "dep": "14:25",
+              "from": "PEK",
+              "arr": "18:25",
+              "to": "KIX",
+              "duration": "3小时",
+              "seat": "767 2-3-2 31英寸"
+            },
+            {
+              "journey": 2,
+              "date": "2026-12-25",
+              "dep": "21:20",
+              "from": "UKB",
+              "arr": "22:30",
+              "to": "HND",
+              "duration": "1小时10分",
+              "seat": "A321 3-3 31英寸"
+            },
+            {
+              "journey": 3,
+              "date": "2026-12-30",
+              "dep": "17:25",
+              "from": "HND",
+              "arr": "20:45",
+              "to": "PEK",
+              "duration": "4小时20分",
+              "seat": "787 3-3-3 34英寸"
+            }
+          ]
+        },
+        {
+          "task": 3,
+          "rank": 3,
+          "price": 2898,
+          "airline": "全日空 ANA",
+          "baggage": "2件托运行李 included",
+          "legs": [
+            {
+              "journey": 1,
+              "date": "2026-12-20",
+              "dep": "14:25",
+              "from": "PEK",
+              "arr": "18:25",
+              "to": "KIX",
+              "duration": "3小时",
+              "seat": "767 2-3-2 31英寸"
+            },
+            {
+              "journey": 2,
+              "date": "2026-12-25",
+              "dep": "07:05",
+              "from": "ITM",
+              "arr": "08:10",
+              "to": "HND",
+              "duration": "1小时05分",
+              "seat": "A321 3-3 31英寸"
+            },
+            {
+              "journey": 3,
+              "date": "2026-12-30",
+              "dep": "17:25",
+              "from": "HND",
+              "arr": "20:45",
+              "to": "PEK",
+              "duration": "4小时20分",
+              "seat": "787 3-3-3 34英寸"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-11-25",
+      "task": 4,
+      "updatedAt": "2026-11-25T11:03:29+08:00",
+      "options": [
+        {
+          "task": 4,
+          "rank": 1,
+          "price": 2690,
+          "airline": "全日空 ANA",
+          "baggage": "2件托运行李 included",
+          "legs": [
+            {
+              "journey": 1,
+              "date": "2027-07-05",
+              "dep": "08:20",
+              "from": "PEK",
+              "arr": "12:55",
+              "to": "HND",
+              "duration": "3小时35分",
+              "seat": "767 2-3-2 31英寸"
+            },
+            {
+              "journey": 2,
+              "date": "2027-07-18",
+              "dep": "08:55",
+              "from": "HND",
+              "arr": "12:00",
+              "to": "PEK",
+              "duration": "4小时05分",
+              "seat": "777 2-4-3 34英寸"
+            }
+          ]
+        },
+        {
+          "task": 4,
+          "rank": 2,
+          "price": 2788,
+          "airline": "全日空 ANA",
+          "baggage": "2件托运行李 included",
+          "legs": [
+            {
+              "journey": 1,
+              "date": "2027-07-05",
+              "dep": "08:20",
+              "from": "PEK",
+              "arr": "12:55",
+              "to": "HND",
+              "duration": "3小时35分",
+              "seat": "767 2-3-2 31英寸"
+            },
+            {
+              "journey": 2,
+              "date": "2027-07-18",
+              "dep": "17:15",
+              "from": "HND",
+              "arr": "20:15",
+              "to": "PEK",
+              "duration": "4小时",
+              "seat": "767 2-3-2 31英寸"
+            }
+          ]
+        },
+        {
+          "task": 4,
+          "rank": 3,
+          "price": 3447,
+          "airline": "全日空 ANA",
+          "baggage": "2件托运行李 included",
+          "legs": [
+            {
+              "journey": 1,
+              "date": "2027-07-05",
+              "dep": "15:10",
+              "from": "PEK",
+              "arr": "19:35",
+              "to": "HND",
+              "duration": "3小时25分",
+              "seat": "777 2-4-3 34英寸"
+            },
+            {
+              "journey": 2,
+              "date": "2027-07-18",
+              "dep": "08:55",
+              "from": "HND",
+              "arr": "12:00",
+              "to": "PEK",
+              "duration": "4小时05分",
+              "seat": "777 2-4-3 34英寸"
             }
           ]
         }
