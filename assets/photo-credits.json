@@ -1,0 +1,101 @@
+[
+  {
+    "file": "tokyo-tower.jpg",
+    "title": "东京塔",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/6/6d/Tokyo_Tower%2C_Minato_City.jpg",
+    "thumbnail": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6d/Tokyo_Tower%2C_Minato_City.jpg/960px-Tokyo_Tower%2C_Minato_City.jpg",
+    "description": "https://commons.wikimedia.org/wiki/File:Tokyo_Tower,_Minato_City.jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Davekern\" title=\"User:Davekern\">David Kernan</a>",
+    "license": "CC BY 4.0",
+    "licenseURL": "https://creativecommons.org/licenses/by/4.0",
+    "changes": "Wikimedia 960px thumbnail; displayed with object-fit cropping."
+  },
+  {
+    "file": "osaka-castle.jpg",
+    "title": "大阪城",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/c/ca/Osaka_Castle_03bs3200.jpg",
+    "thumbnail": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/Osaka_Castle_03bs3200.jpg/960px-Osaka_Castle_03bs3200.jpg",
+    "description": "https://commons.wikimedia.org/wiki/File:Osaka_Castle_03bs3200.jpg",
+    "artist": "<a href=\"https://ja.wikipedia.org/wiki/user:663highland\" class=\"extiw\" title=\"ja:user:663highland\">663highland</a>",
+    "license": "CC BY 2.5",
+    "licenseURL": "https://creativecommons.org/licenses/by/2.5",
+    "changes": "Wikimedia 960px thumbnail; displayed with object-fit cropping."
+  },
+  {
+    "file": "tokyo-skytree.jpg",
+    "title": "东京晴空塔与富士山",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/5/50/Mt.Fuji_%26_Tokyo_SkyTree_%286906783193%29.jpg",
+    "thumbnail": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/50/Mt.Fuji_%26_Tokyo_SkyTree_%286906783193%29.jpg/960px-Mt.Fuji_%26_Tokyo_SkyTree_%286906783193%29.jpg",
+    "description": "https://commons.wikimedia.org/wiki/File:Mt.Fuji_%26_Tokyo_SkyTree_(6906783193).jpg",
+    "artist": "<a rel=\"nofollow\" class=\"external text\" href=\"https://www.flickr.com/people/34264152@N07\">Atomark</a>",
+    "license": "CC BY 2.0",
+    "licenseURL": "https://creativecommons.org/licenses/by/2.0",
+    "changes": "Wikimedia 960px thumbnail; displayed with object-fit cropping."
+  },
+  {
+    "file": "beijing.jpg",
+    "title": "北京天坛",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/5/5f/Temple_of_Heaven_20160323_01.jpg",
+    "thumbnail": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5f/Temple_of_Heaven_20160323_01.jpg/960px-Temple_of_Heaven_20160323_01.jpg",
+    "description": "https://commons.wikimedia.org/wiki/File:Temple_of_Heaven_20160323_01.jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Shujianyang\" title=\"User:Shujianyang\">Shujianyang</a>",
+    "license": "CC BY-SA 4.0",
+    "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0",
+    "changes": "Wikimedia 960px thumbnail; displayed with object-fit cropping."
+  },
+  {
+    "file": "beijing-great-wall.jpg",
+    "title": "北京八达岭长城",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/5/57/Peking_Grosse_Mauer-20071019-RM-115708.jpg",
+    "thumbnail": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Peking_Grosse_Mauer-20071019-RM-115708.jpg/960px-Peking_Grosse_Mauer-20071019-RM-115708.jpg",
+    "description": "https://commons.wikimedia.org/wiki/File:Peking_Grosse_Mauer-20071019-RM-115708.jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Ermell\" title=\"User:Ermell\">Ermell</a>",
+    "license": "CC BY-SA 4.0",
+    "licenseURL": "https://creativecommons.org/licenses/by-sa/4.0",
+    "attribution": "<a href=\"//commons.wikimedia.org/wiki/User:Ermell\" title=\"User:Ermell\">Reinhold Möller</a>",
+    "changes": "Wikimedia 960px thumbnail; displayed with object-fit cropping."
+  },
+  {
+    "file": "osaka-dotonbori.jpg",
+    "title": "大阪道顿堀",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/f/f4/Osaka_Dotonbori_Ebisu_Bridge.jpg",
+    "thumbnail": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f4/Osaka_Dotonbori_Ebisu_Bridge.jpg/960px-Osaka_Dotonbori_Ebisu_Bridge.jpg",
+    "description": "https://commons.wikimedia.org/wiki/File:Osaka_Dotonbori_Ebisu_Bridge.jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:Type_specimen&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:Type specimen (page does not exist)\">Type specimen</a>",
+    "license": "CC BY-SA 3.0",
+    "licenseURL": "https://creativecommons.org/licenses/by-sa/3.0",
+    "changes": "Wikimedia 960px thumbnail; displayed with object-fit cropping."
+  },
+  {
+    "file": "tokyo-sensoji.jpg",
+    "title": "东京浅草寺雷门",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/5/5f/Kaminarimon.jpg",
+    "thumbnail": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5f/Kaminarimon.jpg/960px-Kaminarimon.jpg",
+    "description": "https://commons.wikimedia.org/wiki/File:Kaminarimon.jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Ph0kin\" title=\"User:Ph0kin\">Ph0kin</a>",
+    "license": "Public domain",
+    "changes": "Wikimedia 960px thumbnail; displayed with object-fit cropping."
+  },
+  {
+    "file": "beijing-forbidden-city.jpg",
+    "title": "北京故宫",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/0/07/The_Forbidden_City_in_the_summer.JPG",
+    "thumbnail": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/07/The_Forbidden_City_in_the_summer.JPG/960px-The_Forbidden_City_in_the_summer.JPG",
+    "description": "https://commons.wikimedia.org/wiki/File:The_Forbidden_City_in_the_summer.JPG",
+    "artist": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:Joshua_Doubek&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:Joshua Doubek (page does not exist)\">Joshua Doubek</a>",
+    "license": "CC BY-SA 3.0",
+    "licenseURL": "https://creativecommons.org/licenses/by-sa/3.0",
+    "changes": "Wikimedia 960px thumbnail; displayed with object-fit cropping."
+  },
+  {
+    "file": "beijing-summer-palace.jpg",
+    "title": "北京颐和园",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/d/db/Longevity_Hill_of_the_Summer_Palace.jpg",
+    "thumbnail": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/Longevity_Hill_of_the_Summer_Palace.jpg/960px-Longevity_Hill_of_the_Summer_Palace.jpg",
+    "description": "https://commons.wikimedia.org/wiki/File:Longevity_Hill_of_the_Summer_Palace.jpg",
+    "artist": "xiquinhosilva",
+    "license": "CC BY 2.0",
+    "licenseURL": "https://creativecommons.org/licenses/by/2.0",
+    "changes": "Wikimedia 960px thumbnail; displayed with object-fit cropping."
+  }
+]
